@@ -59,7 +59,6 @@ const parseStatLinks = async function (page){
             console.log(`Parsing links for ${modelName} page number ${pageNumber}. Got ${data.body.length} objects. ${i+1}`);
             pageNumber++;
             i++;
-            if (i>500) return result;
         }
     }
     console.log('Total number of cars:', result.length);

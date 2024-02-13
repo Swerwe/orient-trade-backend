@@ -6,7 +6,7 @@ const sortObject = {
 };
 const filterObject = {
     marka_name:(marka)=>`SUBSTRING_INDEX(title, ' ', 1) = '${marka}'`,
-    model_name:(model)=>`SUBSTRING_INDEX(title, ' ', -1) = '${model}'`,
+    model_name:(model)=>`SUBSTRING(title, INSTR('title', ' ') + 1) = '${model}'`,
     rate:(rate)=>`rate = '${rate}'`,
     mileage_from:(mileage)=>`CAST(mileage AS UNSIGNED) >= ${mileage}`,
     mileage_to:(mileage)=>`CAST(mileage AS UNSIGNED) <= ${mileage}`,
@@ -46,6 +46,12 @@ const getData = async function(table, page, pageSize,query){
             return value !== "";
         })
         .map(([key,value]) => {
+            if (key==="model_name"){
+                if (!query.marka_name) return "";
+
+                return filterObject[key](query.marka_name + " " + value); 
+
+            }
             return filterObject[key](value); 
         }).join(" AND ");
         console.log(filterString);

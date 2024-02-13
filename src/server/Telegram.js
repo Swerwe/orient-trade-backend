@@ -6,6 +6,7 @@ class Telegram{
         this.chatId = '-1002060577009';
     }
     sendMessage(message){
+        console.log("Message:",message);
         return this.bot.sendMessage(this.chatId, message);
     }
 }

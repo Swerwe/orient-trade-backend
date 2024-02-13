@@ -13,13 +13,14 @@ const getCarData = async function(table, marka){
     try{
         const connection = await pool.getConnection();
         const [rows] = await connection.query(
-        `SELECT SUBSTRING_INDEX(title, ' ', -2) AS model, COUNT(*) AS count
+        `SELECT SUBSTRING(title, INSTR('title', ' ') + 1) AS model, COUNT(*) AS count
         FROM ${table}
         WHERE SUBSTRING_INDEX(title, ' ', 1)='${marka}'
-        GROUP BY SUBSTRING_INDEX(title, ' ', -2);`);
+        GROUP BY SUBSTRING(title, INSTR('title', ' ') + 1);`);
         const result = {};
         rows.forEach((obj) => {
-            result[obj.model] = obj.count;
+            const marka = obj.model.substring(obj.model.indexOf(' ') + 1);
+            result[marka] = obj.count;
         });
         return result;
     } catch(error){

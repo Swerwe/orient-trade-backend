@@ -38,6 +38,7 @@ class Telegram{
                 this.bot.sendMessage(chatId,`https://orient-trade.ru/carpage/${id}`);
 
             }catch(e){
+                console.error(e);
                 this.bot.sendMessage(chatId, `Произошла ошибка: ${e}.`);
             }
         });

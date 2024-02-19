@@ -12,6 +12,7 @@ const moment = require('moment-timezone');
 const bodyParser = require('body-parser');
 const Telegram = require('./Telegram');
 const Bot = new Telegram();
+Bot.startEcar();
 const app = express();
 const PORT = 8000;
 async function main(){

@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const parseEcarLink = require('./ecar/parseEcarLink');
-const writeData = require('../sql/writeData');
+const writeEcarData = require('../sql/writeEcarData');
 function isLink(text) {
     // Regular expression to match common URL patterns
     const urlRegex = /(https?|ftp):\/\/[^\s/$.?#].[^\s]*/i;
@@ -34,7 +34,7 @@ class Telegram{
                 this.bot.sendMessage(chatId,`Загрузка...`);
                 const result = await parseEcarLink(link);
                 const id =  parseId(result.link);
-                await writeData([result],'auctions');
+                await writeEcarData([result],'auctions');
                 this.bot.sendMessage(chatId,`https://orient-trade.ru/carpage/${id}`);
 
             }catch(e){

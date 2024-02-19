@@ -14,5 +14,6 @@ const parseEcarLink = async function (link){
 
 
 };
-//parseEcarLink('https://ecarjp.com/auto/lot/ly8XN0E471z9iso');
+//parseEcarLink('https://ecarjp.com/auto/lot/Uz8KYHr6v6brSo');
+
 module.exports = parseEcarLink;

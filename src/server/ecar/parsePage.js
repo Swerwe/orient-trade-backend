@@ -22,79 +22,49 @@ const parsePage = async function(page,_link){
     await page.goto(_link);
     await page.waitForSelector('app-lot-title-full h2');
     await page.waitForSelector('div.ant-descriptions-view > table >tbody');
-    const title = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const rate = tables[0].querySelector('tbody > tr:nth-child(1) > td:nth-child(2)').textContent;
-        return rate.trim();
-    });
     const link = `https://jpcenter.ru/aj-${generateUniqueIdFromString(_link)}_e.htm`;
-
-    const rate = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const rate = tables[0].querySelector('tbody > tr:nth-child(6) > td:nth-child(4)').textContent;
-        return rate.trim();
-    });
-    const equipment = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const equipment = tables[0].querySelector('tbody > tr:nth-child(3) > td:nth-child(4)').textContent;
-        return equipment.trim();
-    });
-    const year = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const year = tables[0].querySelector('tbody > tr:nth-child(2) > td:nth-child(4)').textContent;
-        return year.trim();
-    });
-    const capacityStr = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const capacity = tables[0].querySelector('tbody > tr:nth-child(4) > td:nth-child(4)').textContent;
-        return capacity;
-    });
-    const capacity = parseNumberFromString(capacityStr);
-    const transmission = '';
-    const body = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const body = tables[0].querySelector('tbody > tr:nth-child(3) > td:nth-child(2)').textContent;
-        return body.trim();
-    });
-    const mileage = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const mileage = tables[0].querySelector("tbody > tr:nth-child(5) > td:nth-child(2)").textContent;
-        return mileage.trim();
-    });
-    const auction = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const body = tables[0].querySelector('tbody > tr:nth-child(1) > td:nth-child(4) > app-lot-auction-name > main > section').textContent;
-        return body.trim();
+    const data = await page.evaluate(() => {
+        const body = document.querySelector('div.ant-descriptions-view > table >tbody');
+        const result = {};
+        for (let row of Array.from(body.children)){
+            const cells = Array.from(row.children);
+            for (let i = 0; i<cells.length; i=i+2){
+                const name = cells[i].textContent.trim();
+                let content;
+                switch (name){
+                    case 'Auction':
+                        content = cells[i+1].querySelector('app-lot-auction-name').textContent;
+                        break;
+                    case 'Countdown to finish':
+                        content = cells[i+1].querySelector('span').textContent;
+                        break;
+                    default:
+                        content = cells[i+1].textContent.trim();
+                        break;    
+                }
+                result[name] = content;
+            
+            }
+                 
+        }
+        return result;
     });
     const lotString = await page.evaluate(() => {
         const lot = document.querySelector('app-lot-title h3').textContent;
         return lot.trim();
     });
     const lot = parseNumberFromString(lotString);
-    const status = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const status = tables[0].querySelector('tbody > tr:nth-child(5) > td:nth-child(4)').textContent;
-        return status.trim();
+    const translateAudio = await page.evaluate(() =>{
+        const audioSrc = document.querySelector('audio')?.src;
+        if (audioSrc) return audioSrc;
+        return '';
     });
-    
-    const date = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const date = tables[0].querySelector('tbody > tr:nth-child(2) > td:nth-child(2)').textContent;
-        return date.trim();
+    const translateText = await page.evaluate(() =>{
+        const translations = document.querySelector('app-lot-translations');
+        if (!translations) return '';
+        const translateText = Array.from(translations.querySelectorAll('p')).map(x => x.textContent).join(' ');
+        return translateText;
     });
-    
-    const startPrice = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const startPrice = tables[0].querySelector('tbody > tr:nth-child(7) > td:nth-child(2)').textContent;
-        return startPrice.trim();
-    });
-    const resultPrice = await page.evaluate(() => {
-        const tables = document.querySelectorAll('div.ant-descriptions-view > table');
-        const resultPrice = tables[0].querySelector('tbody > tr:nth-child(8) > td:nth-child(2)').textContent;
-        return resultPrice.trim();
-    });
-    const lastBet = resultPrice || startPrice;
-
     const pageImages = await page.evaluate(() => {
         const pageImages = [];
         document.querySelectorAll('div.thumbs .thumb img').forEach(el => {
@@ -102,23 +72,49 @@ const parsePage = async function(page,_link){
         });
         return pageImages;
     });
-    return {
-        title,
-        link,
-        rate,
-        equipment,
-        year,
-        capacity,
-        transmission,
-        body,
-        mileage,
-        auction,
-        lot,
-        status,
-        date,
-        lastBet,
-        pageImages
+    const result = {link,translateAudio,translateText,pageImages,lot};
+    for (const [key,value] of Object.entries(data)){
+        switch(key){
+            case 'Name':
+                result.name = value;
+                break;
+            case 'Year':
+                result.year = value;
+                break;
+            case 'Color':
+                result.color = value;
+                break;
+            case 'Start price':
+                result.startPrice = value;
+                break;
+            case 'Auction':
+                result.auction = value;
+                break;
+            case 'Chassis ID':
+                result.body = value;
+                break;
+            case 'Engine cc':
+                result.engine = value;
+                break;
+            case 'Auction date':
+                result.auctionDate = value;
+                break;
+            case 'Model grade':
+                result.complectation = value;
+                break;
+            case 'Mileage':
+                result.mileage = value;
+                break;
+            case 'Score':
+                result.rate = value;
+                break;
+            case 'Production date':
+                result.productionDate = value;
+                break;
+        }
+    }
+    return result;
 
-    };
+
 };
 module.exports = parsePage;

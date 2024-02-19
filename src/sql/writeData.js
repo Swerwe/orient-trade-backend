@@ -94,7 +94,7 @@ const writeData = async function (arr, table) {
         queueLimit: 0,
     });
     arr = arr.filter((obj) =>  obj?.pageImages?.length);
-    await clearData(arr, table,pool);
+    //await clearData(arr, table,pool);
     await Promise.all(arr.map((obj) => insertData(table, obj,pool)));
     await pool.end();
     console.log('Data written');

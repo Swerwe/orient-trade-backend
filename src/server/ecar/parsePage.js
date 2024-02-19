@@ -54,6 +54,11 @@ const parsePage = async function(page,_link){
         const body = tables[0].querySelector('tbody > tr:nth-child(3) > td:nth-child(2) > span').textContent;
         return body.trim();
     });
+    const mileage = await page.evaluate(() => {
+        const tables = document.querySelectorAll('table');
+        const mileage = tables[0].querySelector("tbody > tr:nth-child(5) > td:nth-child(2)").textContent;
+        return mileage.trim();
+    });
     const auction = await page.evaluate(() => {
         const tables = document.querySelectorAll('table');
         const body = tables[0].querySelector('tbody > tr:nth-child(1) > td:nth-child(4) > app-lot-auction-name > main > section').textContent;
@@ -104,6 +109,7 @@ const parsePage = async function(page,_link){
         capacity,
         transmission,
         body,
+        mileage,
         auction,
         lot,
         status,

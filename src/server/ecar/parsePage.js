@@ -21,12 +21,15 @@ function parseNumberFromString(str) {
 const parsePage = async function(page,_link){
     await page.goto(_link);
     await page.waitForSelector('app-lot-title-full h2');
-    const title = await page.evaluate(() => {
-        const element = document.querySelector('app-lot-title-full h2');
-        return element.textContent;
-    });
-    const link = `https://jpcenter.ru/aj-${generateUniqueIdFromString(title)}_e.htm`;
     await page.waitForSelector('table >tbody > tr:nth-child(6) > td:nth-child(4) > span');
+    const title = await page.evaluate(() => {
+        const tables = document.querySelectorAll('table');
+        const rate = tables[0].querySelector('tbody > tr:nth-child(1) > td:nth-child(2)').textContent;
+        return rate.trim();
+    });
+    
+    const link = `https://jpcenter.ru/aj-${generateUniqueIdFromString(title)}_e.htm`;
+
     const rate = await page.evaluate(() => {
         const tables = document.querySelectorAll('table');
         const rate = tables[0].querySelector('tbody > tr:nth-child(6) > td:nth-child(4) > span').textContent;

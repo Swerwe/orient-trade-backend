@@ -4,7 +4,7 @@ const login = require('./login');
 const parsePage = require('./parsePage');
 const parseEcarLink = async function (link){
     puppeteer.use(stealthPlugin());
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({args: ['--no-sandbox'], headless:'new'});
     const page =  await login(browser);
     const result = await parsePage(page,link);
     await page.waitForTimeout(2000);

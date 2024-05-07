@@ -4,7 +4,7 @@ const writeData = require('../../sql/writeData');
 //const fs = require('fs').promises;
 
 const parseStatistics = async function (puppeteer) {
-    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'});
+    const browser = await puppeteer.launch({args: ['--no-sandbox'],});
     const page =  await login(browser);
     const data = await parseStatLinks(page);
     //await fs.writeFile('statistics.json', JSON.stringify(data));

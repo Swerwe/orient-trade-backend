@@ -5,7 +5,7 @@ const parseImages = require('../helpers/parseImages');
 const writeData = require('../../sql/writeData');
 const parseAuctions = async function (puppeteer) {
 
-    const browser = await puppeteer.launch({args: ['--no-sandbox'],});
+    const browser = await puppeteer.launch({args: ['--no-sandbox'],headless:new});
     const page =  await login(browser);
     //const data = JSON.parse(await fs.readFile('result.json', 'utf-8'));
     const data = await parseAucLinks(page);

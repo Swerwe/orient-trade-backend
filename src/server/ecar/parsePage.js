@@ -20,7 +20,7 @@ function parseNumberFromString(str) {
 
 const parsePage = async function(page,_link){
     await page.goto(_link);
-    await page.waitForSelector('app-lot-title-full h2');
+    await page.waitForSelector('app-lot-title-full h1');
     await page.waitForSelector('div.ant-descriptions-view > table >tbody');
     const link = `https://jpcenter.ru/aj-${generateUniqueIdFromString(_link)}_e.htm`;
     const data = await page.evaluate(() => {

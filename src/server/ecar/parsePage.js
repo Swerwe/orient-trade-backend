@@ -20,34 +20,32 @@ function parseNumberFromString(str) {
 
 const parsePage = async function(page,_link){
     await page.goto(_link);
-    await page.waitForSelector('app-lot-title-full h1');
     await page.waitForSelector('div.ant-descriptions-view > table >tbody');
     const link = `https://jpcenter.ru/aj-${generateUniqueIdFromString(_link)}_e.htm`;
     const data = await page.evaluate(() => {
-        const body = document.querySelector('div.ant-descriptions-view > table >tbody');
         const result = {};
-        for (let row of Array.from(body.children)){
-            const cells = Array.from(row.children);
-            for (let i = 0; i<cells.length; i=i+2){
-                const name = cells[i].textContent.trim();
-                let content;
-                switch (name){
-                    case 'Auction':
-                        content = cells[i+1].querySelector('app-lot-auction-name').textContent;
-                        break;
-                    case 'Countdown to finish':
-                        content = cells[i+1].querySelector('span').textContent;
-                        break;
-                    default:
-                        content = cells[i+1].textContent.trim();
-                        break;    
-                }
-                result[name] = content;
-            
-            }
-                 
-        }
-        return result;
+
+        const lotInfoSection = document.querySelector('app-lot-main-info> section:first-child');
+        
+        result['Name'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(1)')?.textContent;
+        result['Year'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(7)')?.textContent;
+        result['Color'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(2)')?.textContent;
+        result['Engine cc'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(8)')?.textContent;
+        result['Chassis ID'] = lotInfoSection.querySelector(' nz-row > nz-col:nth-child(4)')?.textContent;
+        result['Mileage'] = lotInfoSection.querySelector(' nz-row > nz-col:nth-child(5)')?.textContent;
+        result['Model grade'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(9)')?.textContent;
+        result['Score'] = lotInfoSection.querySelector('nz-row > nz-col:nth-child(3)')?.textContent;
+
+        const auctionSection = document.querySelector('app-lot-main-info> section:nth-child(2)');
+
+        result['Auction'] = auctionSection.querySelector('nz-row > nz-col:nth-child(1) > app-lot-auction-name > main > section')?.textContent;
+        result['Auction date'] = auctionSection.querySelector('nz-row > nz-col:nth-child(3)')?.textContent;
+
+        const bidsSection = document.querySelector('app-lot-main-info> section:last-child');
+        
+        result["Start price"] = bidsSection.querySelector('nz-row > nz-col.ant-col.ant-col-xs-24 > nz-row > nz-col.ant-col.ant-col-xs-12.ant-col-sm-12.ant-col-md-16 > nz-row > nz-col:nth-child(1)')?.textContent;
+        console.log(result)
+        return result
     });
     const lotString = await page.evaluate(() => {
         const lot = document.querySelector('app-lot-title h3').textContent;
@@ -73,7 +71,8 @@ const parsePage = async function(page,_link){
         return pageImages;
     });
     const result = {link,translateAudio,translateText,pageImages,lot};
-    for (const [key,value] of Object.entries(data)){
+    for (let [key,value] of Object.entries(data)){
+        value = value.trim();
         switch(key){
             case 'Name':
                 result.name = value;
@@ -113,6 +112,7 @@ const parsePage = async function(page,_link){
                 break;
         }
     }
+    console.log(result);
     return result;
 
 
